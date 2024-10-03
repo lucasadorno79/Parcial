@@ -2,65 +2,65 @@
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
-class CiudadDao:
+class ClienteDao:
 
-    def getCiudades(self):
+    def getClientes(self):
 
-        ciudadSQL = """
+        clienteSQL = """
         SELECT id, descripcion
-        FROM ciudades
+        FROM clientes
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(ciudadSQL)
-            ciudades = cur.fetchall() # trae datos de la bd
+            cur.execute(clienteSQL)
+            clientes = cur.fetchall() # trae datos de la bd
 
             # Transformar los datos en una lista de diccionarios
-            return [{'id': ciudad[0], 'descripcion': ciudad[1]} for ciudad in ciudades]
+            return [{'id': cliente[0], 'descripcion': cliente[1]} for cliente in clientes]
 
         except Exception as e:
-            app.logger.error(f"Error al obtener todas las ciudades: {str(e)}")
+            app.logger.error(f"Error al obtener todos los clientes: {str(e)}")
             return []
 
         finally:
             cur.close()
             con.close()
 
-    def getCiudadById(self, id):
+    def getClienteById(self, id):
 
-        ciudadSQL = """
+        clienteSQL = """
         SELECT id, descripcion
-        FROM ciudades WHERE id=%s
+        FROM clientes WHERE id=%s
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(ciudadSQL, (id,))
-            ciudadEncontrada = cur.fetchone() # Obtener una sola fila
-            if ciudadEncontrada:
+            cur.execute(clienteSQL, (id,))
+            clienteEncontrado = cur.fetchone() # Obtener una sola fila
+            if clienteEncontrado:
                 return {
-                        "id": ciudadEncontrada[0],
-                        "descripcion": ciudadEncontrada[1]
+                        "id": clienteEncontrado[0],
+                        "descripcion": clienteEncontrado[1]
                     }  # Retornar los datos de la ciudad
             else:
                 return None # Retornar None si no se encuentra la ciudad
         except Exception as e:
-            app.logger.error(f"Error al obtener ciudad: {str(e)}")
+            app.logger.error(f"Error al obtener cliente: {str(e)}")
             return None
 
         finally:
             cur.close()
             con.close()
 
-    def guardarCiudad(self, descripcion):
+    def guardarCliente(self, descripcion):
 
-        insertCiudadSQL = """
-        INSERT INTO ciudades(descripcion) VALUES(%s) RETURNING id
+        insertClienteSQL = """
+        INSERT INTO clientes(descripcion) VALUES(%s) RETURNING id
         """
 
         conexion = Conexion()
@@ -69,14 +69,14 @@ class CiudadDao:
 
         # Ejecucion exitosa
         try:
-            cur.execute(insertCiudadSQL, (descripcion,))
-            ciudad_id = cur.fetchone()[0]
+            cur.execute(insertClienteSQL, (descripcion,))
+            cliente_id = cur.fetchone()[0]
             con.commit() # se confirma la insercion
-            return ciudad_id
+            return cliente_id
 
         # Si algo fallo entra aqui
         except Exception as e:
-            app.logger.error(f"Error al insertar ciudad: {str(e)}")
+            app.logger.error(f"Error al insertar cliente: {str(e)}")
             con.rollback() # retroceder si hubo error
             return False
 
@@ -85,10 +85,10 @@ class CiudadDao:
             cur.close()
             con.close()
 
-    def updateCiudad(self, id, descripcion):
+    def updateCliente(self, id, descripcion):
 
-        updateCiudadSQL = """
-        UPDATE ciudades
+        updateClienteSQL = """
+        UPDATE clientes
         SET descripcion=%s
         WHERE id=%s
         """
@@ -98,14 +98,14 @@ class CiudadDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateCiudadSQL, (descripcion, id,))
+            cur.execute(updateClienteSQL, (descripcion, id,))
             filas_afectadas = cur.rowcount # Obtener el número de filas afectadas
             con.commit()
 
             return filas_afectadas > 0 # Retornar True si se actualizó al menos una fila
 
         except Exception as e:
-            app.logger.error(f"Error al actualizar ciudad: {str(e)}")
+            app.logger.error(f"Error al actualizar cliente: {str(e)}")
             con.rollback()
             return False
 
@@ -113,10 +113,10 @@ class CiudadDao:
             cur.close()
             con.close()
 
-    def deleteCiudad(self, id):
+    def deleteCliente(self, id):
 
-        updateCiudadSQL = """
-        DELETE FROM ciudades
+        updateClienteSQL = """
+        DELETE FROM clientes
         WHERE id=%s
         """
 
@@ -125,14 +125,14 @@ class CiudadDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateCiudadSQL, (id,))
+            cur.execute(updateClienteSQL, (id,))
             rows_affected = cur.rowcount
             con.commit()
 
             return rows_affected > 0  # Retornar True si se eliminó al menos una fila
 
         except Exception as e:
-            app.logger.error(f"Error al eliminar ciudad: {str(e)}")
+            app.logger.error(f"Error al eliminar cliente: {str(e)}")
             con.rollback()
             return False
 
