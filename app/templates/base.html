@@ -33,7 +33,7 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-warning sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-info sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
@@ -71,10 +71,17 @@
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="{{ url_for('ciudad.ciudadIndex') }}">Pedidos</a>
+                        <a class="collapse-item" href="{{ url_for('cliente.clienteIndex') }}">Cliente</a>
+                        <a class="collapse-item" href="{{ url_for('cargo.cargoIndex') }}">Cargo</a>
+                        <a class="collapse-item" href="{{ url_for('pais.paisIndex') }}">Pais</a>
+                        <a class="collapse-item" href="{{ url_for('direccion.direccionIndex') }}">Direccion</a>
+                        <a class="collapse-item" href="{{ url_for('nacionalidad.nacionalidadIndex') }}">Nacionalidad</a>
+                        <a class="collapse-item" href="{{ url_for('ocupacion.ocupacionIndex') }}">Ocupacion</a>
+                        <a class="collapse-item" href="{{ url_for('equipo.equipoIndex') }}">Equipo</a>
+
+
                     </div>
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{ url_for('ciudad.ciudadIndex') }}">Cliente</a>
-                    </div>
+                    
                 </div>
                 
             </li>

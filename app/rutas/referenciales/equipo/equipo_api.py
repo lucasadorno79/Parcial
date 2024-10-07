@@ -1,60 +1,60 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.referenciales.cliente.ClienteDao import ClienteDao
+from app.dao.referenciales.equipo.EquipoDao import EquipoDao
 
-cliapi = Blueprint('cliapi', __name__)
+equapi = Blueprint('equapi', __name__)
 
-# Trae todas las ciudades
-@cliapi.route('/clientes', methods=['GET'])
-def getClientes():
-    clidao = ClienteDao()
+# Trae todos los equipos
+@equapi.route('/equipos', methods=['GET'])
+def getEquipos():
+    equdao = EquipoDao()
 
     try:
-        clientes = clidao.getClientes()
+        equipos = equdao.getEquipos()  # Puedes cambiar el método si tienes uno específico para equipos
 
         return jsonify({
             'success': True,
-            'data': clientes,
+            'data': equipos,
             'error': None
         }), 200
 
     except Exception as e:
-        app.logger.error(f"Error al obtener todas las clientes: {str(e)}")
+        app.logger.error(f"Error al obtener todos los equipos: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/clientes/<int:cliente_id>', methods=['GET'])
-def getCliente(cliente_id):
-    clidao = ClienteDao()
+@equapi.route('/equipos/<int:equipo_id>', methods=['GET'])
+def getEquipo(equipo_id):
+    equdao = EquipoDao()
 
     try:
-        cliente = clidao.getClienteById(cliente_id)
+        equipo = equdao.getEquipoById(equipo_id)  # Cambia el método si tienes uno específico para equipos
 
-        if cliente:
+        if equipo:
             return jsonify({
                 'success': True,
-                'data': cliente,
+                'data': equipo,
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el cliente con el ID proporcionado.'
+                'error': 'No se encontró el equipo con el ID proporcionado.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al obtener cliente: {str(e)}")
+        app.logger.error(f"Error al obtener equipo: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-# Agrega una nueva ciudad
-@cliapi.route('/clientes', methods=['POST'])
-def addCliente():
+# Agrega un nuevo equipo
+@equapi.route('/equipos', methods=['POST'])
+def addEquipo():
     data = request.get_json()
-    cliente = ClienteDao()
+    equdao = EquipoDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -63,32 +63,32 @@ def addCliente():
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                            'success': False,
-                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-                            }), 400
+                'success': False,
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+            }), 400
 
     try:
         descripcion = data['descripcion'].upper()
-        cliente_id = cliente.guardarCliente(descripcion)
-        if cliente_id is not None:
+        equipo_id = equdao.guardarEquipo(descripcion)  # Cambia el método si tienes uno específico para equipos
+        if equipo_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': cliente_id, 'descripcion': descripcion},
+                'data': {'id': equipo_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
-            return jsonify({ 'success': False, 'error': 'No se pudo guardar al cliente. Consulte con el administrador.' }), 500
+            return jsonify({'success': False, 'error': 'No se pudo guardar el equipo. Consulte con el administrador.'}), 500
     except Exception as e:
-        app.logger.error(f"Error al agregar cliente: {str(e)}")
+        app.logger.error(f"Error al agregar equipo: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/cliente/<int:cliente_id>', methods=['PUT'])
-def updateCliente(cliente_id):
+@equapi.route('/equipos/<int:equipo_id>', methods=['PUT'])
+def updateEquipo(equipo_id):
     data = request.get_json()
-    clidao = ClienteDao()
+    equdao = EquipoDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -97,49 +97,49 @@ def updateCliente(cliente_id):
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                            'success': False,
-                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-                            }), 400
+                'success': False,
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+            }), 400
     descripcion = data['descripcion']
     try:
-        if clidao.updateCliente(cliente_id, descripcion.upper()):
+        if equdao.updateEquipo(equipo_id, descripcion.upper()):  # Cambia el método si tienes uno específico para equipos
             return jsonify({
                 'success': True,
-                'data': {'id': cliente_id, 'descripcion': descripcion},
+                'data': {'id': equipo_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró al cliente con el ID proporcionado o no se pudo actualizar.'
+                'error': 'No se encontró el equipo con el ID proporcionado o no se pudo actualizar.'
             }), 404
     except Exception as e:
-        app.logger.error(f"Error al actualizar cliente: {str(e)}")
+        app.logger.error(f"Error al actualizar equipo: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/clientes/<int:cliente_id>', methods=['DELETE'])
-def deleteCliente(cliente_id):
-    clidao = ClienteDao()
+@equapi.route('/equipos/<int:equipo_id>', methods=['DELETE'])
+def deleteEquipo(equipo_id):
+    equdao = EquipoDao()
 
     try:
         # Usar el retorno de eliminarCiudad para determinar el éxito
-        if clidao.deleteCliente(cliente_id):
+        if equdao.deleteEquipo(equipo_id):  # Cambia el método si tienes uno específico para equipos
             return jsonify({
                 'success': True,
-                'mensaje': f'Cliente con ID {cliente_id} eliminada correctamente.',
+                'mensaje': f'Equipo con ID {equipo_id} eliminado correctamente.',
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el cliente con el ID proporcionado o no se pudo eliminar.'
+                'error': 'No se encontró el equipo con el ID proporcionado o no se pudo eliminar.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al eliminar cliente: {str(e)}")
+        app.logger.error(f"Error al eliminar equipo: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'

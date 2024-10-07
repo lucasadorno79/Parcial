@@ -1,60 +1,60 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.referenciales.cliente.ClienteDao import ClienteDao
+from app.dao.referenciales.direccion.DireccionDao import DireccionDao
 
-cliapi = Blueprint('cliapi', __name__)
+dirapi = Blueprint('dirapi', __name__)
 
-# Trae todas las ciudades
-@cliapi.route('/clientes', methods=['GET'])
-def getClientes():
-    clidao = ClienteDao()
+# Trae todas las direcciones
+@dirapi.route('/direcciones', methods=['GET'])
+def getDirecciones():
+    dirdao = DireccionDao()
 
     try:
-        clientes = clidao.getClientes()
+        direcciones = dirdao.getDirecciones()
 
         return jsonify({
             'success': True,
-            'data': clientes,
+            'data': direcciones,
             'error': None
         }), 200
 
     except Exception as e:
-        app.logger.error(f"Error al obtener todas las clientes: {str(e)}")
+        app.logger.error(f"Error al obtener todas las direcciones: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/clientes/<int:cliente_id>', methods=['GET'])
-def getCliente(cliente_id):
-    clidao = ClienteDao()
+@dirapi.route('/direcciones/<int:direccion_id>', methods=['GET'])
+def getDireccion(direccion_id):
+    dirdao = DireccionDao()
 
     try:
-        cliente = clidao.getClienteById(cliente_id)
+        direccion = dirdao.getDireccionById(direccion_id)
 
-        if cliente:
+        if direccion:
             return jsonify({
                 'success': True,
-                'data': cliente,
+                'data': direccion,
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el cliente con el ID proporcionado.'
+                'error': 'No se encontró la direccion con el ID proporcionado.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al obtener cliente: {str(e)}")
+        app.logger.error(f"Error al obtener direccion: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-# Agrega una nueva ciudad
-@cliapi.route('/clientes', methods=['POST'])
-def addCliente():
+# Agrega una nueva direccion
+@dirapi.route('/direcciones', methods=['POST'])
+def addDireccion():
     data = request.get_json()
-    cliente = ClienteDao()
+    dirdao = DireccionDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -63,32 +63,35 @@ def addCliente():
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                            'success': False,
-                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-                            }), 400
+                'success': False,
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+            }), 400
 
     try:
         descripcion = data['descripcion'].upper()
-        cliente_id = cliente.guardarCliente(descripcion)
-        if cliente_id is not None:
+        direccion_id = dirdao.guardarDireccion(descripcion)
+        if direccion_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': cliente_id, 'descripcion': descripcion},
+                'data': {'id': direccion_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
-            return jsonify({ 'success': False, 'error': 'No se pudo guardar al cliente. Consulte con el administrador.' }), 500
+            return jsonify({
+                'success': False,
+                'error': 'No se pudo guardar la direccion. Consulte con el administrador.'
+            }), 500
     except Exception as e:
-        app.logger.error(f"Error al agregar cliente: {str(e)}")
+        app.logger.error(f"Error al agregar direccion: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/cliente/<int:cliente_id>', methods=['PUT'])
-def updateCliente(cliente_id):
+@dirapi.route('/direcciones/<int:direccion_id>', methods=['PUT'])
+def updateDireccion(direccion_id):
     data = request.get_json()
-    clidao = ClienteDao()
+    dirdao = DireccionDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -97,49 +100,49 @@ def updateCliente(cliente_id):
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                            'success': False,
-                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-                            }), 400
+                'success': False,
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+            }), 400
     descripcion = data['descripcion']
     try:
-        if clidao.updateCliente(cliente_id, descripcion.upper()):
+        if dirdao.updateDireccion(direccion_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': cliente_id, 'descripcion': descripcion},
+                'data': {'id': direccion_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró al cliente con el ID proporcionado o no se pudo actualizar.'
+                'error': 'No se encontró la direccion con el ID proporcionado o no se pudo actualizar.'
             }), 404
     except Exception as e:
-        app.logger.error(f"Error al actualizar cliente: {str(e)}")
+        app.logger.error(f"Error al actualizar direccion: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/clientes/<int:cliente_id>', methods=['DELETE'])
-def deleteCliente(cliente_id):
-    clidao = ClienteDao()
+@dirapi.route('/direcciones/<int:direccion_id>', methods=['DELETE'])
+def deleteDireccion(direccion_id):
+    dirdao = DireccionDao()
 
     try:
-        # Usar el retorno de eliminarCiudad para determinar el éxito
-        if clidao.deleteCliente(cliente_id):
+        # Usar el retorno de eliminarDireccion para determinar el éxito
+        if dirdao.deleteDireccion(direccion_id):
             return jsonify({
                 'success': True,
-                'mensaje': f'Cliente con ID {cliente_id} eliminada correctamente.',
+                'mensaje': f'Direccion con ID {direccion_id} eliminada correctamente.',
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el cliente con el ID proporcionado o no se pudo eliminar.'
+                'error': 'No se encontró la direccion con el ID proporcionado o no se pudo eliminar.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al eliminar cliente: {str(e)}")
+        app.logger.error(f"Error al eliminar direccion: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'

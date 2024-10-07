@@ -1,60 +1,60 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.referenciales.cliente.ClienteDao import ClienteDao
+from app.dao.referenciales.pais.PaisDao import PaisDao
 
-cliapi = Blueprint('cliapi', __name__)
+paiapi = Blueprint('paiapi', __name__)
 
 # Trae todas las ciudades
-@cliapi.route('/clientes', methods=['GET'])
-def getClientes():
-    clidao = ClienteDao()
+@paiapi.route('/paises', methods=['GET'])
+def getPaises():
+    paidao = PaisDao()
 
     try:
-        clientes = clidao.getClientes()
+        paises = paidao.getPaises()
 
         return jsonify({
             'success': True,
-            'data': clientes,
+            'data': paises,
             'error': None
         }), 200
 
     except Exception as e:
-        app.logger.error(f"Error al obtener todas las clientes: {str(e)}")
+        app.logger.error(f"Error al obtener todos los paises: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/clientes/<int:cliente_id>', methods=['GET'])
-def getCliente(cliente_id):
-    clidao = ClienteDao()
+@paiapi.route('/paises/<int:pais_id>', methods=['GET'])
+def getPais(pais_id):
+    paidao = PaisDao()
 
     try:
-        cliente = clidao.getClienteById(cliente_id)
+        pais = paidao.getPaisById(pais_id)
 
-        if cliente:
+        if pais:
             return jsonify({
                 'success': True,
-                'data': cliente,
+                'data': pais,
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el cliente con el ID proporcionado.'
+                'error': 'No se encontró el pais con el ID proporcionado.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al obtener cliente: {str(e)}")
+        app.logger.error(f"Error al obtener pais: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
 # Agrega una nueva ciudad
-@cliapi.route('/clientes', methods=['POST'])
-def addCliente():
+@paiapi.route('/paises', methods=['POST'])
+def addPais():
     data = request.get_json()
-    cliente = ClienteDao()
+    paidao = PaisDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -69,26 +69,26 @@ def addCliente():
 
     try:
         descripcion = data['descripcion'].upper()
-        cliente_id = cliente.guardarCliente(descripcion)
-        if cliente_id is not None:
+        pais_id = paidao.guardarPais(descripcion)
+        if pais_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': cliente_id, 'descripcion': descripcion},
+                'data': {'id': pais_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
-            return jsonify({ 'success': False, 'error': 'No se pudo guardar al cliente. Consulte con el administrador.' }), 500
+            return jsonify({ 'success': False, 'error': 'No se pudo guardar el pais. Consulte con el administrador.' }), 500
     except Exception as e:
-        app.logger.error(f"Error al agregar cliente: {str(e)}")
+        app.logger.error(f"Error al agregar pais: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/cliente/<int:cliente_id>', methods=['PUT'])
-def updateCliente(cliente_id):
+@paiapi.route('/paises/<int:pais_id>', methods=['PUT'])
+def updatePais(pais_id):
     data = request.get_json()
-    clidao = ClienteDao()
+    paidao = PaisDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -102,44 +102,44 @@ def updateCliente(cliente_id):
                             }), 400
     descripcion = data['descripcion']
     try:
-        if clidao.updateCliente(cliente_id, descripcion.upper()):
+        if paidao.updateCiudad(pais_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': cliente_id, 'descripcion': descripcion},
+                'data': {'id': pais_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró al cliente con el ID proporcionado o no se pudo actualizar.'
+                'error': 'No se encontró el pais con el ID proporcionado o no se pudo actualizar.'
             }), 404
     except Exception as e:
-        app.logger.error(f"Error al actualizar cliente: {str(e)}")
+        app.logger.error(f"Error al actualizar pais: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/clientes/<int:cliente_id>', methods=['DELETE'])
-def deleteCliente(cliente_id):
-    clidao = ClienteDao()
+@paiapi.route('/paises/<int:pais_id>', methods=['DELETE'])
+def deletePais(pais_id):
+    paidao = PaisDao()
 
     try:
         # Usar el retorno de eliminarCiudad para determinar el éxito
-        if clidao.deleteCliente(cliente_id):
+        if paidao.deletePais(pais_id):
             return jsonify({
                 'success': True,
-                'mensaje': f'Cliente con ID {cliente_id} eliminada correctamente.',
+                'mensaje': f'Pais con ID {pais_id} eliminada correctamente.',
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el cliente con el ID proporcionado o no se pudo eliminar.'
+                'error': 'No se encontró el pais con el ID proporcionado o no se pudo eliminar.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al eliminar cliente: {str(e)}")
+        app.logger.error(f"Error al eliminar pais: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'

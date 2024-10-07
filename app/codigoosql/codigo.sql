@@ -1,4 +1,4 @@
-CREATE TABLE ciudad(
+CREATE TABLE ciudades(
     id SERIAL PRIMARY KEY,
     descripcion VARCHAR(60) UNIQUE NOT NULL
 );
