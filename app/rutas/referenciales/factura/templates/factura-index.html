@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
     
 {% block titulo %}
-Ocupaciones
+Facturas
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Cargar ocupacion</h3>
+    <h3>Cargar facturas</h3>
 
     <!-- tarjeta -->
     <div class="card">
@@ -42,9 +42,9 @@ Ocupaciones
           <!-- Modal body -->
           <div class="modal-body">
             <div class="form-group">
-              <input type="hidden" id="txtIdOcupacion">
+              <input type="hidden" id="txtIdFactura">
               <label for="txtDescripcion">Descripción:</label>
-              <input type="text" class="form-control" placeholder="Ingrese alguna ocupación" id="txtDescripcion">
+              <input type="text" class="form-control" placeholder="Ingrese alguna factura" id="txtDescripcion">
             </div>
           </div>
 
@@ -77,7 +77,7 @@ Ocupaciones
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax:'/api/v1/ocupaciones',
+      ajax:'/api/v1/facturas',
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
@@ -92,9 +92,9 @@ Ocupaciones
   const agregar = () => {
     $('#btnAgregar').on('click', function(){
       // Setear un título a modal
-      $('#modalTitle').text("Agregar una Ocupación");
+      $('#modalTitle').text("Agregar una Factura");
       // inicia ventana modal
-      $('#txtIdOcupacion').val("");
+      $('#txtIdFactura').val("");
       $('#txtDescripcion').val("");
       $('#modalFormulario').modal();
     });
@@ -102,13 +102,13 @@ Ocupaciones
 
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
-      const idOcupacion = $('#txtIdOcupacion').val();
+      const idFactura = $('#txtIdFactura').val();
       const nuevaDescripcion = $('#txtDescripcion').val();
       const tabla = $('#tbl').DataTable();
 
-      if(idOcupacion) {
+      if(idFactura) {
         // update
-        fetch(`/api/v1/ocupaciones/${idOcupacion}`, {
+        fetch(`/api/v1/facturas/${idFactura}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -118,17 +118,17 @@ Ocupaciones
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "La ocupación ha sido actualizada correctamente.", "success");
+            Swal.fire("Actualizado", "La factura ha sido actualizada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         }).catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar la ocupación.", "error");
+          Swal.fire("Error", "Ocurrió un error al actualizar la factura.", "error");
         });
       } else {
         // insert
-        fetch(`/api/v1/ocupaciones`, {
+        fetch(`/api/v1/facturas`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -138,13 +138,13 @@ Ocupaciones
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "La ocupación ha sido agregada correctamente.", "success");
+            Swal.fire("Agregado", "La factura ha sido agregada correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         }).catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar la ocupación.", "error");
+          Swal.fire("Error", "Ocurrió un error al guardar la factura.", "error");
         });
       }
       $('#txtDescripcion').val("");
@@ -162,13 +162,13 @@ Ocupaciones
         cancelButtonText: `No`
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar una Ocupación");
+          $('#modalTitle').text("Editar una Factura");
 
-          const idOcupacion = $(this).data('id');
-          $('#txtIdOcupacion').val(idOcupacion);
+          const idFactura = $(this).data('id');
+          $('#txtIdFactura').val(idFactura);
 
           // Necesitamos obtener la descripción del backend
-          fetch(`/api/v1/ocupaciones/${idOcupacion}`, {
+          fetch(`/api/v1/facturas/${idFactura}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
@@ -186,7 +186,7 @@ Ocupaciones
 
   const eliminar = () => {
     $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
-      const idOcupacion = $(this).data('id');
+      const idFactura = $(this).data('id');
       // Mostrar mensaje de confirmación usando sweetalert
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
@@ -195,7 +195,7 @@ Ocupaciones
         cancelButtonText: `No`
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/ocupaciones/${idOcupacion}`, {
+          fetch(`/api/v1/facturas/${idFactura}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
@@ -205,7 +205,7 @@ Ocupaciones
           .then(data => {
             if(data && !data.error && data.success) {
               // Para borrar la fila del datatable(cliente)
-              const fila =$(this).closest('tr');
+              const fila = $(this).closest('tr');
               const tabla = $('#tbl').DataTable();
               tabla.row(fila).remove().draw();
               Swal.fire("Eliminado", "", data.success);
@@ -213,11 +213,10 @@ Ocupaciones
               Swal.fire(data.error);
             }
           }).catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar la ocupación.", "error");
+            Swal.fire("Error", "Ocurrió un error al eliminar la factura.", "error");
           });
         }
       });
-
     });
   }
 

@@ -1,60 +1,60 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.referenciales.sucursal.SucursalDao import SucursalDao
+from app.dao.referenciales.factura.FacturaDao import FacturaDao
 
-sucapi = Blueprint('sucapi', __name__)
+facapi = Blueprint('facapi', __name__)
 
-# Trae todas las sucursales
-@sucapi.route('/sucursales', methods=['GET'])
-def getSucursales():
-    sucdao = SucursalDao()
+# Trae todas las facturas
+@facapi.route('/facturas', methods=['GET'])
+def getFacturas():
+    facdao = FacturaDao()
 
     try:
-        sucursales = sucdao.getSucursales()  # Puedes mantener el método como está si devuelve las sucursales
+        facturas = facdao.getFacturas()
 
         return jsonify({
             'success': True,
-            'data': sucursales,
+            'data': facturas,
             'error': None
         }), 200
 
     except Exception as e:
-        app.logger.error(f"Error al obtener todas las sucursales: {str(e)}")
+        app.logger.error(f"Error al obtener todas las facturas: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@sucapi.route('/sucursales/<int:sucursal_id>', methods=['GET'])
-def getSucursal(sucursal_id):
-    sucdao = SucursalDao()
+@facapi.route('/facturas/<int:factura_id>', methods=['GET'])
+def getFactura(factura_id):
+    facdao = FacturaDao()
 
     try:
-        sucursal = sucdao.getSucursalById(sucursal_id)  # Método para obtener una sucursal por ID
+        factura = facdao.getFacturaById(factura_id)
 
-        if sucursal:
+        if factura:
             return jsonify({
                 'success': True,
-                'data': sucursal,
+                'data': factura,
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró la sucursal con el ID proporcionado.'
+                'error': 'No se encontró la factura con el ID proporcionado.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al obtener sucursal: {str(e)}")
+        app.logger.error(f"Error al obtener factura: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-# Agrega una nueva sucursal
-@sucapi.route('/sucursales', methods=['POST'])
-def addSucursal():
+# Agrega una nueva factura
+@facapi.route('/facturas', methods=['POST'])
+def addFactura():
     data = request.get_json()
-    sucursal = SucursalDao()
+    facdao = FacturaDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -69,26 +69,26 @@ def addSucursal():
 
     try:
         descripcion = data['descripcion'].upper()
-        sucursal_id = sucursal.guardarSucursal(descripcion)  # Método para guardar la sucursal
-        if sucursal_id is not None:
+        factura_id = facdao.guardarFactura(descripcion)
+        if factura_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': sucursal_id, 'descripcion': descripcion},
+                'data': {'id': factura_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
-            return jsonify({'success': False, 'error': 'No se pudo guardar la sucursal. Consulte con el administrador.'}), 500
+            return jsonify({'success': False, 'error': 'No se pudo guardar la factura. Consulte con el administrador.'}), 500
     except Exception as e:
-        app.logger.error(f"Error al agregar sucursal: {str(e)}")
+        app.logger.error(f"Error al agregar factura: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@sucapi.route('/sucursal/<int:sucursal_id>', methods=['PUT'])
-def updateSucursal(sucursal_id):
+@facapi.route('/facturas/<int:factura_id>', methods=['PUT'])
+def updateFactura(factura_id):
     data = request.get_json()
-    sucdao = SucursalDao()
+    facdao = FacturaDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -102,44 +102,44 @@ def updateSucursal(sucursal_id):
             }), 400
     descripcion = data['descripcion']
     try:
-        if sucdao.updateSucursal(sucursal_id, descripcion.upper()):  # Método para actualizar la sucursal
+        if facdao.updateFactura(factura_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': sucursal_id, 'descripcion': descripcion},
+                'data': {'id': factura_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró la sucursal con el ID proporcionado o no se pudo actualizar.'
+                'error': 'No se encontró la factura con el ID proporcionado o no se pudo actualizar.'
             }), 404
     except Exception as e:
-        app.logger.error(f"Error al actualizar sucursal: {str(e)}")
+        app.logger.error(f"Error al actualizar factura: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@sucapi.route('/sucursales/<int:sucursal_id>', methods=['DELETE'])
-def deleteSucursal(sucursal_id):
-    sucdao = SucursalDao()
+@facapi.route('/facturas/<int:factura_id>', methods=['DELETE'])
+def deleteFactura(factura_id):
+    facdao = FacturaDao()
 
     try:
-        # Usar el retorno de eliminarSucursal para determinar el éxito
-        if sucdao.deleteSucursal(sucursal_id):  # Método para eliminar la sucursal
+        # Usar el retorno de eliminarFactura para determinar el éxito
+        if facdao.deleteFactura(factura_id):
             return jsonify({
                 'success': True,
-                'mensaje': f'Sucursal con ID {sucursal_id} eliminada correctamente.',
+                'mensaje': f'Factura con ID {factura_id} eliminada correctamente.',
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró la sucursal con el ID proporcionado o no se pudo eliminar.'
+                'error': 'No se encontró la factura con el ID proporcionado o no se pudo eliminar.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al eliminar sucursal: {str(e)}")
+        app.logger.error(f"Error al eliminar factura: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'

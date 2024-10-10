@@ -1,60 +1,60 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.referenciales.telefono.TelefonoDao import TelefonoDao
+from app.dao.referenciales.vehiculo.VehiculoDao import VehiculoDao
 
-telapi = Blueprint('telapi', __name__)
+vehapi = Blueprint('vehapi', __name__)
 
-# Trae todos los telefonos
-@telapi.route('/telefonos', methods=['GET'])
-def getTelefonos():
-    teldao = TelefonoDao()
+# Trae todos los vehiculos
+@vehapi.route('/vehiculos', methods=['GET'])
+def getVehiculos():
+    vehdao = VehiculoDao()
 
     try:
-        telefonos = teldao.getTelefonos()
+        vehiculos = vehdao.getVehiculos()
 
         return jsonify({
             'success': True,
-            'data': telefonos,
+            'data': vehiculos,
             'error': None
         }), 200
 
     except Exception as e:
-        app.logger.error(f"Error al obtener todos los telefonos: {str(e)}")
+        app.logger.error(f"Error al obtener todos los vehiculos: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@telapi.route('/telefonos/<int:telefono_id>', methods=['GET'])
-def getTelefono(telefono_id):
-    teldao = TelefonoDao()
+@vehapi.route('/vehiculos/<int:vehiculo_id>', methods=['GET'])
+def getVehiculo(vehiculo_id):
+    vehdao = VehiculoDao()
 
     try:
-        telefono = teldao.getTelefonoById(telefono_id)
+        vehiculo = vehdao.getVehiculoById(vehiculo_id)
 
-        if telefono:
+        if vehiculo:
             return jsonify({
                 'success': True,
-                'data': telefono,
+                'data': vehiculo,
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el telefono con el ID proporcionado.'
+                'error': 'No se encontró el vehiculo con el ID proporcionado.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al obtener telefono: {str(e)}")
+        app.logger.error(f"Error al obtener vehiculo: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-# Agrega un nuevo telefono
-@telapi.route('/telefonos', methods=['POST'])
-def addTelefono():
+# Agrega un nuevo vehiculo
+@vehapi.route('/vehiculos', methods=['POST'])
+def addVehiculo():
     data = request.get_json()
-    teldao = TelefonoDao()
+    vehdao = VehiculoDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -63,32 +63,32 @@ def addTelefono():
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                'success': False,
-                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-            }), 400
+                            'success': False,
+                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+                            }), 400
 
     try:
         descripcion = data['descripcion'].upper()
-        telefono_id = teldao.guardarTelefono(descripcion)
-        if telefono_id is not None:
+        vehiculo_id = vehdao.guardarVehiculo(descripcion)
+        if vehiculo_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': telefono_id, 'descripcion': descripcion},
+                'data': {'id': vehiculo_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
-            return jsonify({'success': False, 'error': 'No se pudo guardar el telefono. Consulte con el administrador.'}), 500
+            return jsonify({ 'success': False, 'error': 'No se pudo guardar el vehiculo. Consulte con el administrador.' }), 500
     except Exception as e:
-        app.logger.error(f"Error al agregar telefono: {str(e)}")
+        app.logger.error(f"Error al agregar vehiculo: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@telapi.route('/telefonos/<int:telefono_id>', methods=['PUT'])
-def updateTelefono(telefono_id):
+@vehapi.route('/vehiculos/<int:vehiculo_id>', methods=['PUT'])
+def updateVehiculo(vehiculo_id):
     data = request.get_json()
-    teldao = TelefonoDao()
+    vehdao = VehiculoDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -97,49 +97,49 @@ def updateTelefono(telefono_id):
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                'success': False,
-                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-            }), 400
+                            'success': False,
+                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+                            }), 400
     descripcion = data['descripcion']
     try:
-        if teldao.updateTelefono(telefono_id, descripcion.upper()):
+        if vehdao.updateVehiculo(vehiculo_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': telefono_id, 'descripcion': descripcion},
+                'data': {'id': vehiculo_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el telefono con el ID proporcionado o no se pudo actualizar.'
+                'error': 'No se encontró el vehiculo con el ID proporcionado o no se pudo actualizar.'
             }), 404
     except Exception as e:
-        app.logger.error(f"Error al actualizar telefono: {str(e)}")
+        app.logger.error(f"Error al actualizar vehiculo: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@telapi.route('/telefonos/<int:telefono_id>', methods=['DELETE'])
-def deleteTelefono(telefono_id):
-    teldao = TelefonoDao()
+@vehapi.route('/vehiculos/<int:vehiculo_id>', methods=['DELETE'])
+def deleteVehiculo(vehiculo_id):
+    vehdao = VehiculoDao()
 
     try:
-        # Usar el retorno de eliminarTelefono para determinar el éxito
-        if teldao.deleteTelefono(telefono_id):
+        # Usar el retorno de eliminarVehiculo para determinar el éxito
+        if vehdao.deleteVehiculo(vehiculo_id):
             return jsonify({
                 'success': True,
-                'mensaje': f'Telefono con ID {telefono_id} eliminada correctamente.',
+                'mensaje': f'Vehiculo con ID {vehiculo_id} eliminado correctamente.',
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el telefono con el ID proporcionado o no se pudo eliminar.'
+                'error': 'No se encontró el vehiculo con el ID proporcionado o no se pudo eliminar.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al eliminar telefono: {str(e)}")
+        app.logger.error(f"Error al eliminar vehiculo: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'

@@ -1,66 +1,66 @@
-# Data access object - DAO
+# Data access object - DAO 
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
-class DireccionDao:
+class FacturaDao:
 
-    def getDirecciones(self):
+    def getFacturas(self):
 
-        direccionSQL = """
+        facturaSQL = """
         SELECT id, descripcion
-        FROM direcciones
+        FROM facturas
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(direccionSQL)
-            direcciones = cur.fetchall()  # trae datos de la bd
+            cur.execute(facturaSQL)
+            facturas = cur.fetchall()  # trae datos de la bd
 
             # Transformar los datos en una lista de diccionarios
-            return [{'id': direccion[0], 'descripcion': direccion[1]} for direccion in direcciones]
+            return [{'id': factura[0], 'descripcion': factura[1]} for factura in facturas]
 
         except Exception as e:
-            app.logger.error(f"Error al obtener todas las direcciones: {str(e)}")
+            app.logger.error(f"Error al obtener todas las facturas: {str(e)}")
             return []
 
         finally:
             cur.close()
             con.close()
 
-    def getDireccionById(self, id):
+    def getFacturaById(self, id):
 
-        direccionSQL = """
+        facturaSQL = """
         SELECT id, descripcion
-        FROM direcciones WHERE id=%s
+        FROM facturas WHERE id=%s
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(direccionSQL, (id,))
-            direccionEncontrada = cur.fetchone()  # Obtener una sola fila
-            if direccionEncontrada:
+            cur.execute(facturaSQL, (id,))
+            facturaEncontrada = cur.fetchone()  # Obtener una sola fila
+            if facturaEncontrada:
                 return {
-                    "id": direccionEncontrada[0],
-                    "descripcion": direccionEncontrada[1]
-                }  # Retornar los datos de la direccion
+                    "id": facturaEncontrada[0],
+                    "descripcion": facturaEncontrada[1]
+                }  # Retornar los datos de la factura
             else:
-                return None  # Retornar None si no se encuentra la direccion
+                return None  # Retornar None si no se encuentra la factura
         except Exception as e:
-            app.logger.error(f"Error al obtener direccion: {str(e)}")
+            app.logger.error(f"Error al obtener factura: {str(e)}")
             return None
 
         finally:
             cur.close()
             con.close()
 
-    def guardarDireccion(self, descripcion):
+    def guardarFactura(self, descripcion):
 
-        insertDireccionSQL = """
-        INSERT INTO direcciones(descripcion) VALUES(%s) RETURNING id
+        insertFacturaSQL = """
+        INSERT INTO facturas(descripcion) VALUES(%s) RETURNING id
         """
 
         conexion = Conexion()
@@ -69,14 +69,14 @@ class DireccionDao:
 
         # Ejecucion exitosa
         try:
-            cur.execute(insertDireccionSQL, (descripcion,))
-            direccion_id = cur.fetchone()[0]
+            cur.execute(insertFacturaSQL, (descripcion,))
+            factura_id = cur.fetchone()[0]
             con.commit()  # se confirma la insercion
-            return direccion_id
+            return factura_id
 
         # Si algo fallo entra aqui
         except Exception as e:
-            app.logger.error(f"Error al insertar direccion: {str(e)}")
+            app.logger.error(f"Error al insertar factura: {str(e)}")
             con.rollback()  # retroceder si hubo error
             return False
 
@@ -85,10 +85,10 @@ class DireccionDao:
             cur.close()
             con.close()
 
-    def updateDireccion(self, id, descripcion):
+    def updateFactura(self, id, descripcion):
 
-        updateDireccionSQL = """
-        UPDATE direcciones
+        updateFacturaSQL = """
+        UPDATE facturas
         SET descripcion=%s
         WHERE id=%s
         """
@@ -98,14 +98,14 @@ class DireccionDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateDireccionSQL, (descripcion, id,))
+            cur.execute(updateFacturaSQL, (descripcion, id,))
             filas_afectadas = cur.rowcount  # Obtener el número de filas afectadas
             con.commit()
 
             return filas_afectadas > 0  # Retornar True si se actualizó al menos una fila
 
         except Exception as e:
-            app.logger.error(f"Error al actualizar direccion: {str(e)}")
+            app.logger.error(f"Error al actualizar factura: {str(e)}")
             con.rollback()
             return False
 
@@ -113,10 +113,10 @@ class DireccionDao:
             cur.close()
             con.close()
 
-    def deleteDireccion(self, id):
+    def deleteFactura(self, id):
 
-        deleteDireccionSQL = """
-        DELETE FROM direcciones
+        deleteFacturaSQL = """
+        DELETE FROM facturas
         WHERE id=%s
         """
 
@@ -125,14 +125,14 @@ class DireccionDao:
         cur = con.cursor()
 
         try:
-            cur.execute(deleteDireccionSQL, (id,))
+            cur.execute(deleteFacturaSQL, (id,))
             rows_affected = cur.rowcount
             con.commit()
 
             return rows_affected > 0  # Retornar True si se eliminó al menos una fila
 
         except Exception as e:
-            app.logger.error(f"Error al eliminar direccion: {str(e)}")
+            app.logger.error(f"Error al eliminar factura: {str(e)}")
             con.rollback()
             return False
 

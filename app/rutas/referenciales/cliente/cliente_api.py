@@ -3,7 +3,7 @@ from app.dao.referenciales.cliente.ClienteDao import ClienteDao
 
 cliapi = Blueprint('cliapi', __name__)
 
-# Trae todas las ciudades
+# Trae todos los clientes
 @cliapi.route('/clientes', methods=['GET'])
 def getClientes():
     clidao = ClienteDao()
@@ -18,7 +18,7 @@ def getClientes():
         }), 200
 
     except Exception as e:
-        app.logger.error(f"Error al obtener todas las clientes: {str(e)}")
+        app.logger.error(f"Error al obtener todos los clientes: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
@@ -50,34 +50,39 @@ def getCliente(cliente_id):
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-# Agrega una nueva ciudad
+# Agrega un nuevo cliente
 @cliapi.route('/clientes', methods=['POST'])
 def addCliente():
     data = request.get_json()
-    cliente = ClienteDao()
+    clidao = ClienteDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
-    campos_requeridos = ['descripcion']
+    campos_requeridos = ['nombre', 'direccion', 'telefono', 'correo_electronico']
 
     # Verificar si faltan campos o son vacíos
     for campo in campos_requeridos:
-        if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
+        if campo not in data or data[campo] is None or len(str(data[campo]).strip()) == 0:
             return jsonify({
                             'success': False,
                             'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
                             }), 400
 
     try:
-        descripcion = data['descripcion'].upper()
-        cliente_id = cliente.guardarCliente(descripcion)
+        nombre = data['nombre'].upper()
+        direccion = data['direccion'].upper()
+        telefono = data['telefono']
+        correo_electronico = data['correo_electronico'].lower()
+
+        cliente_id = clidao.guardarCliente(nombre, direccion, telefono, correo_electronico)
         if cliente_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': cliente_id, 'descripcion': descripcion},
+                'data': {'id': cliente_id, 'nombre': nombre, 'direccion': direccion, 
+                         'telefono': telefono, 'correo_electronico': correo_electronico},
                 'error': None
             }), 201
         else:
-            return jsonify({ 'success': False, 'error': 'No se pudo guardar al cliente. Consulte con el administrador.' }), 500
+            return jsonify({ 'success': False, 'error': 'No se pudo guardar el cliente. Consulte con el administrador.' }), 500
     except Exception as e:
         app.logger.error(f"Error al agregar cliente: {str(e)}")
         return jsonify({
@@ -85,33 +90,39 @@ def addCliente():
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@cliapi.route('/cliente/<int:cliente_id>', methods=['PUT'])
+@cliapi.route('/clientes/<int:cliente_id>', methods=['PUT'])
 def updateCliente(cliente_id):
     data = request.get_json()
     clidao = ClienteDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
-    campos_requeridos = ['descripcion']
+    campos_requeridos = ['nombre', 'direccion', 'telefono', 'correo_electronico']
 
     # Verificar si faltan campos o son vacíos
     for campo in campos_requeridos:
-        if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
+        if campo not in data or data[campo] is None or len(str(data[campo]).strip()) == 0:
             return jsonify({
                             'success': False,
                             'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
                             }), 400
-    descripcion = data['descripcion']
+
+    nombre = data['nombre'].upper()
+    direccion = data['direccion'].upper()
+    telefono = data['telefono']
+    correo_electronico = data['correo_electronico'].lower()
+
     try:
-        if clidao.updateCliente(cliente_id, descripcion.upper()):
+        if clidao.updateCliente(cliente_id, nombre, direccion, telefono, correo_electronico):
             return jsonify({
                 'success': True,
-                'data': {'id': cliente_id, 'descripcion': descripcion},
+                'data': {'id': cliente_id, 'nombre': nombre, 'direccion': direccion, 
+                         'telefono': telefono, 'correo_electronico': correo_electronico},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró al cliente con el ID proporcionado o no se pudo actualizar.'
+                'error': 'No se encontró el cliente con el ID proporcionado o no se pudo actualizar.'
             }), 404
     except Exception as e:
         app.logger.error(f"Error al actualizar cliente: {str(e)}")
@@ -125,11 +136,11 @@ def deleteCliente(cliente_id):
     clidao = ClienteDao()
 
     try:
-        # Usar el retorno de eliminarCiudad para determinar el éxito
+        # Usar el retorno de eliminarCliente para determinar el éxito
         if clidao.deleteCliente(cliente_id):
             return jsonify({
                 'success': True,
-                'mensaje': f'Cliente con ID {cliente_id} eliminada correctamente.',
+                'mensaje': f'Cliente con ID {cliente_id} eliminado correctamente.',
                 'error': None
             }), 200
         else:

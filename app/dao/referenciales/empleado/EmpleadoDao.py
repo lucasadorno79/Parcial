@@ -2,65 +2,65 @@
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
-class TelefonoDao:
+class EmpleadoDao:
 
-    def getTelefonos(self):
+    def getEmpleados(self):
 
-        telefonoSQL = """
+        empleadoSQL = """
         SELECT id, descripcion
-        FROM telefonos
+        FROM empleados
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(telefonoSQL)
-            telefonos = cur.fetchall()  # trae datos de la bd
+            cur.execute(empleadoSQL)
+            empleados = cur.fetchall()  # trae datos de la bd
 
             # Transformar los datos en una lista de diccionarios
-            return [{'id': telefono[0], 'descripcion': telefono[1]} for telefono in telefonos]
+            return [{'id': empleado[0], 'descripcion': empleado[1]} for empleado in empleados]
 
         except Exception as e:
-            app.logger.error(f"Error al obtener todos los telefonos: {str(e)}")
+            app.logger.error(f"Error al obtener todos los empleados: {str(e)}")
             return []
 
         finally:
             cur.close()
             con.close()
 
-    def getTelefonoById(self, id):
+    def getEmpleadoById(self, id):
 
-        telefonoSQL = """
+        empleadoSQL = """
         SELECT id, descripcion
-        FROM telefonos WHERE id=%s
+        FROM empleados WHERE id=%s
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(telefonoSQL, (id,))
-            telefonoEncontrado = cur.fetchone()  # Obtener una sola fila
-            if telefonoEncontrado:
+            cur.execute(empleadoSQL, (id,))
+            empleadoEncontrado = cur.fetchone()  # Obtener una sola fila
+            if empleadoEncontrado:
                 return {
-                    "id": telefonoEncontrado[0],
-                    "descripcion": telefonoEncontrado[1]
-                }  # Retornar los datos del telefono
+                    "id": empleadoEncontrado[0],
+                    "descripcion": empleadoEncontrado[1]
+                }  # Retornar los datos del empleado
             else:
-                return None  # Retornar None si no se encuentra el telefono
+                return None  # Retornar None si no se encuentra el empleado
         except Exception as e:
-            app.logger.error(f"Error al obtener telefono: {str(e)}")
+            app.logger.error(f"Error al obtener empleado: {str(e)}")
             return None
 
         finally:
             cur.close()
             con.close()
 
-    def guardarTelefono(self, descripcion):
+    def guardarEmpleado(self, descripcion):
 
-        insertTelefonoSQL = """
-        INSERT INTO telefonos(descripcion) VALUES(%s) RETURNING id
+        insertEmpleadoSQL = """
+        INSERT INTO empleados(descripcion) VALUES(%s) RETURNING id
         """
 
         conexion = Conexion()
@@ -69,26 +69,26 @@ class TelefonoDao:
 
         # Ejecucion exitosa
         try:
-            cur.execute(insertTelefonoSQL, (descripcion,))
-            telefono_id = cur.fetchone()[0]
+            cur.execute(insertEmpleadoSQL, (descripcion,))
+            empleado_id = cur.fetchone()[0]
             con.commit()  # se confirma la insercion
-            return telefono_id
+            return empleado_id
 
-        # Si algo fallo entra aqui
+        # Si algo fallo entra aquí
         except Exception as e:
-            app.logger.error(f"Error al insertar telefono: {str(e)}")
+            app.logger.error(f"Error al insertar empleado: {str(e)}")
             con.rollback()  # retroceder si hubo error
             return False
 
-        # Siempre se va ejecutar
+        # Siempre se va a ejecutar
         finally:
             cur.close()
             con.close()
 
-    def updateTelefono(self, id, descripcion):
+    def updateEmpleado(self, id, descripcion):
 
-        updateTelefonoSQL = """
-        UPDATE telefonos
+        updateEmpleadoSQL = """
+        UPDATE empleados
         SET descripcion=%s
         WHERE id=%s
         """
@@ -98,14 +98,14 @@ class TelefonoDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateTelefonoSQL, (descripcion, id,))
+            cur.execute(updateEmpleadoSQL, (descripcion, id,))
             filas_afectadas = cur.rowcount  # Obtener el número de filas afectadas
             con.commit()
 
             return filas_afectadas > 0  # Retornar True si se actualizó al menos una fila
 
         except Exception as e:
-            app.logger.error(f"Error al actualizar telefono: {str(e)}")
+            app.logger.error(f"Error al actualizar empleado: {str(e)}")
             con.rollback()
             return False
 
@@ -113,10 +113,10 @@ class TelefonoDao:
             cur.close()
             con.close()
 
-    def deleteTelefono(self, id):
+    def deleteEmpleado(self, id):
 
-        updateTelefonoSQL = """
-        DELETE FROM telefonos
+        deleteEmpleadoSQL = """
+        DELETE FROM empleados
         WHERE id=%s
         """
 
@@ -125,14 +125,14 @@ class TelefonoDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateTelefonoSQL, (id,))
+            cur.execute(deleteEmpleadoSQL, (id,))
             rows_affected = cur.rowcount
             con.commit()
 
             return rows_affected > 0  # Retornar True si se eliminó al menos una fila
 
         except Exception as e:
-            app.logger.error(f"Error al eliminar telefono: {str(e)}")
+            app.logger.error(f"Error al eliminar empleado: {str(e)}")
             con.rollback()
             return False
 
