@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block titulo %}
-Nombres de Jugadores
+Jugadores
 {% endblock %}
 
 {% block contenido %}
 <div class="container mt-4">
-    <h3>Cargar nombres de jugadores</h3>
+    <h3>Cargar Jugadores</h3>
 
     <!-- tarjeta -->
     <div class="card">
@@ -22,7 +22,7 @@ Nombres de Jugadores
             </tr>
           </thead>
           <tbody></tbody>
-        </table>
+      </table>
       </div>
     </div>
     <!-- /tarjeta -->
@@ -42,9 +42,9 @@ Nombres de Jugadores
           <!-- Modal body -->
           <div class="modal-body">
             <div class="form-group">
-              <input type="hidden" id="txtIdNombreJugador">
+              <input type="hidden" id="txtIdJugador">
               <label for="txtDescripcion">Descripción:</label>
-              <input type="text" class="form-control" placeholder="Ingrese el nombre del jugador" id="txtDescripcion">
+              <input type="text" class="form-control" placeholder="Ingrese algún jugador" id="txtDescripcion">
             </div>
           </div>
 
@@ -77,7 +77,7 @@ Nombres de Jugadores
       language: {
         url: "{{ url_for('static', filename='vendor/datatables/es-ES.json') }}",
       },
-      ajax:'/api/v1/nombres_jugadores',
+      ajax:'/api/v1/jugadores',
       columns: [
         { data: 'descripcion' },
         { data: function(row) {
@@ -92,9 +92,9 @@ Nombres de Jugadores
   const agregar = () => {
     $('#btnAgregar').on('click', function(){
       // Setear un título a modal
-      $('#modalTitle').text("Agregar un Nombre de Jugador");
+      $('#modalTitle').text("Agregar un Jugador");
       // inicia ventana modal
-      $('#txtIdNombreJugador').val("");
+      $('#txtIdJugador').val("");
       $('#txtDescripcion').val("");
       $('#modalFormulario').modal();
     });
@@ -102,49 +102,49 @@ Nombres de Jugadores
 
   const guardar = () => {
     $('#btnGuardar').on('click', function() {
-      const idNombreJugador = $('#txtIdNombreJugador').val();
+      const idJugador = $('#txtIdJugador').val();
       const nuevaDescripcion = $('#txtDescripcion').val();
       const tabla = $('#tbl').DataTable();
 
-      if(idNombreJugador) {
+      if(idJugador) {
         // update
-        fetch(`/api/v1/nombres_jugadores/${idNombreJugador}`, {
+        fetch(`/api/v1/jugadores/${idJugador}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion })
+          }, body: JSON.stringify({ descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Actualizado", "El nombre del jugador ha sido actualizado correctamente.", "success");
+            Swal.fire("Actualizado", "El jugador ha sido actualizado correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         }).catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al actualizar el nombre del jugador.", "error");
+          Swal.fire("Error", "Ocurrió un error al actualizar el jugador.", "error");
         });
       } else {
         // insert
-        fetch(`/api/v1/nombres_jugadores`, {
+        fetch(`/api/v1/jugadores`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
-          }, body: JSON.stringify({ descripcion: nuevaDescripcion })
+          }, body: JSON.stringify({ descripcion: nuevaDescripcion})
         })
         .then(resp => resp.json())
         .then(data => {
           if(data && !data.error && data.success) {
             tabla.ajax.reload();
-            Swal.fire("Agregado", "El nombre del jugador ha sido agregado correctamente.", "success");
+            Swal.fire("Actualizado", "El jugador ha sido agregado correctamente.", "success");
           } else {
             Swal.fire(data.error);
           }
         }).catch(err => {
           console.error(err);
-          Swal.fire("Error", "Ocurrió un error al guardar el nombre del jugador.", "error");
+          Swal.fire("Error", "Ocurrió un error al guardar el jugador.", "error");
         });
       }
       $('#txtDescripcion').val("");
@@ -153,7 +153,7 @@ Nombres de Jugadores
   }
 
   const editar = () => {
-    $('#tbl').on('click', 'button[name="btn_editar"]', function(){
+    $('#tbl').on('click', 'button[name="btn_editar"]',function(){
       // Mostrar mensaje de confirmación usando sweetalert
       Swal.fire({
         title: "¿Deseas editar este registro?",
@@ -162,13 +162,13 @@ Nombres de Jugadores
         cancelButtonText: `No`
       }).then((result) => {
         if (result.isConfirmed) {
-          $('#modalTitle').text("Editar un Nombre de Jugador");
+          $('#modalTitle').text("Editar un Jugador");
 
-          const idNombreJugador = $(this).data('id');
-          $('#txtIdNombreJugador').val(idNombreJugador);
+          const idJugador = $(this).data('id');
+          $('#txtIdJugador').val(idJugador);
 
           // Necesitamos obtener la descripción del backend
-          fetch(`/api/v1/nombres_jugadores/${idNombreJugador}`, {
+          fetch(`/api/v1/jugadores/${idJugador}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
@@ -185,8 +185,9 @@ Nombres de Jugadores
   }
 
   const eliminar = () => {
-    $('#tbl').on('click', 'button[name="btn_eliminar"]', function(){
-      const idNombreJugador = $(this).data('id');
+    $('#tbl').on('click', 'button[name="btn_eliminar"]',function(){
+      const idJugador
+       = $(this).data('id');
       // Mostrar mensaje de confirmación usando sweetalert
       Swal.fire({
         title: "¿Deseas eliminar este registro?",
@@ -195,7 +196,7 @@ Nombres de Jugadores
         cancelButtonText: `No`
       }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/api/v1/nombres_jugadores/${idNombreJugador}`, {
+          fetch(`/api/v1/jugadores/${idJugador}`, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json'
@@ -213,11 +214,10 @@ Nombres de Jugadores
               Swal.fire(data.error);
             }
           }).catch(err => {
-            Swal.fire("Error", "Ocurrió un error al eliminar el nombre del jugador.", "error");
+            Swal.fire("Error", "Ocurrió un error al eliminar el jugador.", "error");
           });
         }
       });
-
     });
   }
 

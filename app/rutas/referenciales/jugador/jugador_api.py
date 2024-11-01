@@ -1,60 +1,60 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.referenciales.pais.PaisDao import PaisDao
+from app.dao.referenciales.jugador.JugadorDao import JugadorDao
 
-paiapi = Blueprint('paiapi', __name__)
+jugapi = Blueprint('jugapi', __name__)
 
-# Trae todas las ciudades
-@paiapi.route('/paises', methods=['GET'])
-def getPaises():
-    paidao = PaisDao()
+# Trae todos los jugadores
+@jugapi.route('/jugadores', methods=['GET'])
+def getJugadores():
+    jugdao = JugadorDao()
 
     try:
-        paises = paidao.getPaises()
+        jugadores = jugdao.getJugadores()
 
         return jsonify({
             'success': True,
-            'data': paises,
+            'data': jugadores,
             'error': None
         }), 200
 
     except Exception as e:
-        app.logger.error(f"Error al obtener todos los paises: {str(e)}")
+        app.logger.error(f"Error al obtener todos los jugadores: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@paiapi.route('/paises/<int:pais_id>', methods=['GET'])
-def getPais(pais_id):
-    paidao = PaisDao()
+@jugapi.route('/jugadores/<int:jugador_id>', methods=['GET'])
+def getJugador(jugador_id):
+    jugdao = JugadorDao()
 
     try:
-        pais = paidao.getPaisById(pais_id)
+        jugador = jugdao.getJugadorById(jugador_id)
 
-        if pais:
+        if jugador:
             return jsonify({
                 'success': True,
-                'data': pais,
+                'data': jugador,
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el pais con el ID proporcionado.'
+                'error': 'No se encontró el jugador con el ID proporcionado.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al obtener pais: {str(e)}")
+        app.logger.error(f"Error al obtener jugador: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-# Agrega una nueva ciudad
-@paiapi.route('/paises', methods=['POST'])
-def addPais():
+# Agrega un nuevo jugador
+@jugapi.route('/jugadores', methods=['POST'])
+def addJugador():
     data = request.get_json()
-    paidao = PaisDao()
+    jugdao = JugadorDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -63,32 +63,32 @@ def addPais():
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                            'success': False,
-                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-                            }), 400
+                'success': False,
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+            }), 400
 
     try:
         descripcion = data['descripcion'].upper()
-        pais_id = paidao.guardarPais(descripcion)
-        if pais_id is not None:
+        jugador_id = jugdao.guardarJugador(descripcion)
+        if jugador_id is not None:
             return jsonify({
                 'success': True,
-                'data': {'id': pais_id, 'descripcion': descripcion},
+                'data': {'id': jugador_id, 'descripcion': descripcion},
                 'error': None
             }), 201
         else:
-            return jsonify({ 'success': False, 'error': 'No se pudo guardar el pais. Consulte con el administrador.' }), 500
+            return jsonify({'success': False, 'error': 'No se pudo guardar el jugador. Consulte con el administrador.'}), 500
     except Exception as e:
-        app.logger.error(f"Error al agregar pais: {str(e)}")
+        app.logger.error(f"Error al agregar jugador: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@paiapi.route('/paises/<int:pais_id>', methods=['PUT'])
-def updatePais(pais_id):
+@jugapi.route('/jugadores/<int:jugador_id>', methods=['PUT'])
+def updateJugador(jugador_id):
     data = request.get_json()
-    paidao = PaisDao()
+    jugdao = JugadorDao()
 
     # Validar que el JSON no esté vacío y tenga las propiedades necesarias
     campos_requeridos = ['descripcion']
@@ -97,49 +97,48 @@ def updatePais(pais_id):
     for campo in campos_requeridos:
         if campo not in data or data[campo] is None or len(data[campo].strip()) == 0:
             return jsonify({
-                            'success': False,
-                            'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
-                            }), 400
+                'success': False,
+                'error': f'El campo {campo} es obligatorio y no puede estar vacío.'
+            }), 400
     descripcion = data['descripcion']
     try:
-        if paidao.updatePais(pais_id, descripcion.upper()):
+        if jugdao.updateJugador(jugador_id, descripcion.upper()):
             return jsonify({
                 'success': True,
-                'data': {'id': pais_id, 'descripcion': descripcion},
+                'data': {'id': jugador_id, 'descripcion': descripcion},
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el pais con el ID proporcionado o no se pudo actualizar.'
+                'error': 'No se encontró el jugador con el ID proporcionado o no se pudo actualizar.'
             }), 404
     except Exception as e:
-        app.logger.error(f"Error al actualizar pais: {str(e)}")
+        app.logger.error(f"Error al actualizar jugador: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'
         }), 500
 
-@paiapi.route('/paises/<int:pais_id>', methods=['DELETE'])
-def deletePais(pais_id):
-    paidao = PaisDao()
+@jugapi.route('/jugadores/<int:jugador_id>', methods=['DELETE'])
+def deleteJugador(jugador_id):
+    jugdao = JugadorDao()
 
     try:
-        # Usar el retorno de eliminarCiudad para determinar el éxito
-        if paidao.deletePais(pais_id):
+        if jugdao.deleteJugador(jugador_id):
             return jsonify({
                 'success': True,
-                'mensaje': f'Pais con ID {pais_id} eliminada correctamente.',
+                'mensaje': f'Jugador con ID {jugador_id} eliminado correctamente.',
                 'error': None
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'error': 'No se encontró el pais con el ID proporcionado o no se pudo eliminar.'
+                'error': 'No se encontró el jugador con el ID proporcionado o no se pudo eliminar.'
             }), 404
 
     except Exception as e:
-        app.logger.error(f"Error al eliminar pais: {str(e)}")
+        app.logger.error(f"Error al eliminar jugador: {str(e)}")
         return jsonify({
             'success': False,
             'error': 'Ocurrió un error interno. Consulte con el administrador.'

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 
-sucmod = Blueprint('sucursal', __name__, template_folder='templates')
+sucurmod = Blueprint('sucursal', __name__, template_folder='templates')
 
-@sucmod.route('/sucursal-index')
+@sucurmod.route('/sucursal-index')
 def sucursalIndex():
     return render_template('sucursal-index.html')

@@ -11,7 +11,7 @@ CREATE TABLE clientes(
     correo_electronico text not null
 );
 
-CREATE TABLE datosjugador(
+CREATE TABLE jugadores(
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(60) UNIQUE NOT null,
     dorsal numeric not null

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, current_app as app
-from app.dao.referenciales.empleado.EmpleadoDao import EmpleadoDao
+from app.dao.referenciales.empleado.empleado_dao import EmpleadoDao
 
 empapi = Blueprint('empapi', __name__)
 

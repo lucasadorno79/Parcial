@@ -2,65 +2,65 @@
 from flask import current_app as app
 from app.conexion.Conexion import Conexion
 
-class EmpleadoDao:
+class JugadorDao:
 
-    def getEmpleados(self):
+    def getJugadores(self):
 
-        empleadoSQL = """
+        jugadorSQL = """
         SELECT id, descripcion
-        FROM empleados
+        FROM jugadores
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(empleadoSQL)
-            empleados = cur.fetchall()  # trae datos de la bd
+            cur.execute(jugadorSQL)
+            jugadores = cur.fetchall()  # trae datos de la bd
 
             # Transformar los datos en una lista de diccionarios
-            return [{'id': empleado[0], 'descripcion': empleado[1]} for empleado in empleados]
+            return [{'id': jugador[0], 'descripcion': jugador[1]} for jugador in jugadores]
 
         except Exception as e:
-            app.logger.error(f"Error al obtener todos los empleados: {str(e)}")
+            app.logger.error(f"Error al obtener todos los jugadores: {str(e)}")
             return []
 
         finally:
             cur.close()
             con.close()
 
-    def getEmpleadoById(self, id):
+    def getJugadorById(self, id):
 
-        empleadoSQL = """
+        jugadorSQL = """
         SELECT id, descripcion
-        FROM empleados WHERE id=%s
+        FROM jugadores WHERE id=%s
         """
         # objeto conexion
         conexion = Conexion()
         con = conexion.getConexion()
         cur = con.cursor()
         try:
-            cur.execute(empleadoSQL, (id,))
-            empleadoEncontrado = cur.fetchone()  # Obtener una sola fila
-            if empleadoEncontrado:
+            cur.execute(jugadorSQL, (id,))
+            jugadorEncontrado = cur.fetchone()  # Obtener una sola fila
+            if jugadorEncontrado:
                 return {
-                    "id": empleadoEncontrado[0],
-                    "descripcion": empleadoEncontrado[1]
-                }  # Retornar los datos del empleado
+                    "id": jugadorEncontrado[0],
+                    "descripcion": jugadorEncontrado[1]
+                }  # Retornar los datos del jugador
             else:
-                return None  # Retornar None si no se encuentra el empleado
+                return None  # Retornar None si no se encuentra el jugador
         except Exception as e:
-            app.logger.error(f"Error al obtener empleado: {str(e)}")
+            app.logger.error(f"Error al obtener jugador: {str(e)}")
             return None
 
         finally:
             cur.close()
             con.close()
 
-    def guardarEmpleado(self, descripcion):
+    def guardarJugador(self, descripcion):
 
-        insertEmpleadoSQL = """
-        INSERT INTO empleados(descripcion) VALUES(%s) RETURNING id
+        insertJugadorSQL = """
+        INSERT INTO jugadores(descripcion) VALUES(%s) RETURNING id
         """
 
         conexion = Conexion()
@@ -69,26 +69,26 @@ class EmpleadoDao:
 
         # Ejecucion exitosa
         try:
-            cur.execute(insertEmpleadoSQL, (descripcion,))
-            empleado_id = cur.fetchone()[0]
+            cur.execute(insertJugadorSQL, (descripcion,))
+            jugador_id = cur.fetchone()[0]
             con.commit()  # se confirma la insercion
-            return empleado_id
+            return jugador_id
 
-        # Si algo fallo entra aquí
+        # Si algo fallo entra aqui
         except Exception as e:
-            app.logger.error(f"Error al insertar empleado: {str(e)}")
+            app.logger.error(f"Error al insertar jugador: {str(e)}")
             con.rollback()  # retroceder si hubo error
             return False
 
-        # Siempre se va a ejecutar
+        # Siempre se va ejecutar
         finally:
             cur.close()
             con.close()
 
-    def updateEmpleado(self, id, descripcion):
+    def updateJugador(self, id, descripcion):
 
-        updateEmpleadoSQL = """
-        UPDATE empleados
+        updateJugadorSQL = """
+        UPDATE jugadores
         SET descripcion=%s
         WHERE id=%s
         """
@@ -98,14 +98,14 @@ class EmpleadoDao:
         cur = con.cursor()
 
         try:
-            cur.execute(updateEmpleadoSQL, (descripcion, id,))
+            cur.execute(updateJugadorSQL, (descripcion, id,))
             filas_afectadas = cur.rowcount  # Obtener el número de filas afectadas
             con.commit()
 
             return filas_afectadas > 0  # Retornar True si se actualizó al menos una fila
 
         except Exception as e:
-            app.logger.error(f"Error al actualizar empleado: {str(e)}")
+            app.logger.error(f"Error al actualizar jugador: {str(e)}")
             con.rollback()
             return False
 
@@ -113,10 +113,10 @@ class EmpleadoDao:
             cur.close()
             con.close()
 
-    def deleteEmpleado(self, id):
+    def deleteJugador(self, id):
 
-        deleteEmpleadoSQL = """
-        DELETE FROM empleados
+        deleteJugadorSQL = """
+        DELETE FROM jugadores
         WHERE id=%s
         """
 
@@ -125,14 +125,14 @@ class EmpleadoDao:
         cur = con.cursor()
 
         try:
-            cur.execute(deleteEmpleadoSQL, (id,))
+            cur.execute(deleteJugadorSQL, (id,))
             rows_affected = cur.rowcount
             con.commit()
 
             return rows_affected > 0  # Retornar True si se eliminó al menos una fila
 
         except Exception as e:
-            app.logger.error(f"Error al eliminar empleado: {str(e)}")
+            app.logger.error(f"Error al eliminar jugador: {str(e)}")
             con.rollback()
             return False
 
