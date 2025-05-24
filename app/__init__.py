@@ -1,12 +1,12 @@
 from datetime import timedelta 
 from flask import Flask
-from flask_wtf.csrf import CSRFProtect
+#from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
 
 #Crear token
-crsf = CSRFProtect()
-crsf.init_app(app)
+#crsf = CSRFProtect()
+#crsf.init_app(app)
 
 #Inicializar secret key
 app.secret_key = b'_5#y2L"F6Q7z\n\xec]'
